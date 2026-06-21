@@ -119,7 +119,7 @@ Omkar
 2. npm run dev
 
 
-"C:\Users\omkar\OneDrive\Desktop\SPMS\project assets\attendance summary.png"
+project assets/attendance summary.png
 <img width="1920" height="1080" alt="teacher login" src="https://github.com/user-attachments/assets/55a7999f-ab17-41b4-ab15-cf908d9b7f7f" />
 <img width="1920" height="1080" alt="teacher dashboard" src="https://github.com/user-attachments/assets/6d1e2474-5c59-4afc-955a-59e1b2397706" />
 <img width="1920" height="1080" alt="student login" src="https://github.com/user-attachments/assets/8211e4b1-86c4-4b3a-aa91-d2b1b584060f" />
