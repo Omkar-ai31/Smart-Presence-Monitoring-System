@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Teacher Dashboard - SPMS</title>
+
+  <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+
+  <!-- SYSTEM CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/system.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/pages.css') }}">
+</head>
+
+<body class="dashboard-shell">
+
+  <!-- TOPBAR -->
+  <header class="topbar flex-between">
+    <div>
+      <div class="topbar-title">Teacher Dashboard</div>
+      <div class="topbar-subtitle">
+        {{ session.get('teacher_name', 'Teacher') }}
+      </div>
+    </div>
+
+    <a href="{{ url_for('teacher_logout') }}" class="btn btn-ghost">
+      Logout
+    </a>
+  </header>
+
+  <!-- MAIN -->
+  <main class="dashboard-main page-shell">
+
+    <!-- COURSES (TOP CONTEXT LAYER) -->
+    <div class="card">
+      <div class="section-header">
+        <div class="h-md">Courses</div>
+      </div>
+
+      <div class="grid-3 mt-4">
+        {% for c in courses %}
+        <div class="panel course-block">
+          <div>
+            <div class="course-title">
+              {{ c.name }} ({{ c.code }})
+            </div>
+            <div class="text-muted mt-2">
+              {{ c.studentIds|length }} students
+            </div>
+          </div>
+
+          <div class="mt-3">
+            <button class="btn full-width"
+                    onclick="createSession('{{ c._id }}')">
+              Create Session
+            </button>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- OPERATION GRID -->
+    <div class="dashboard-grid section-spacing">
+
+      <!-- SESSION CONTROL -->
+      <div class="card priority">
+        <div class="section-header">
+          <div class="h-md">Session Control</div>
+        </div>
+
+        <div class="mt-3">
+          <label class="text-secondary">Session ID</label>
+          <input id="sessionRoom" class="input mt-1" readonly>
+        </div>
+
+        <div class="mt-3">
+          <button class="btn btn-accent full-width"
+                  onclick="startSession()">
+            Generate PIN & Start Session
+          </button>
+        </div>
+
+        <div class="mt-2">
+          <button class="btn full-width"
+                  onclick="confirmStopSession()">
+            Stop Session
+          </button>
+        </div>
+
+        <div class="mt-4 stat">
+          <div class="stat-label">Time Left</div>
+          <div id="countdownText" class="stat-value mt-1">--:--</div>
+        </div>
+      </div>
+
+      <!-- LIVE ATTENDANCE -->
+      <div class="card data-layer">
+        <div class="section-header">
+          <div class="h-md">Live Attendance</div>
+        </div>
+
+        <div class="analytics-header mt-3">
+  <div>
+    <div class="stat-value" id="presentCount">0</div>
+    <div class="stat-label">Students Present</div>
+  </div>
+
+  <div class="analytics-divider"></div>
+
+  <div>
+    <div class="stat-value" id="attendancePercent">0%</div>
+    <div class="stat-label">Attendance Rate</div>
+  </div>
+</div>
+
+        <ul id="liveList" class="list mt-4"></ul>
+        <div id="emptyState" class="empty-state">No students connected yet</div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- SCRIPT -->
+  <script>
+
+  const API_BASE = "{{ api_base }}";
+  const BACKEND_BASE = API_BASE.replace("/api", "");
+  const TOKEN = "{{ token }}";
+
+  let currentSessionId = null;
+  let sessionExpiry = null;
+  let countdownInterval = null;
+  let sessionActive = false;
+
+  const socket = io(BACKEND_BASE, {
+    transports: ["websocket", "polling"]
+  });
+
+  socket.on("attendanceUpdate", (data) => {
+    updateLiveUI(data);
+  });
+
+  async function createSession(courseId) {
+    const res = await fetch(`${API_BASE}/sessions`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${TOKEN}`
+      },
+      body: JSON.stringify({ courseInstanceId: courseId })
+    });
+
+    const data = await res.json();
+
+    currentSessionId = data._id;
+    document.getElementById("sessionRoom").value = data._id;
+    sessionActive = false;
+
+    showToast("Session created successfully");
+  }
+
+  async function startSession() {
+    if (!currentSessionId)
+      return showToast("Create session first");
+
+    if (sessionActive)
+      return showToast("Session already started");
+
+    const res = await fetch(`${API_BASE}/sessions/${currentSessionId}/start`, {
+      method: "POST",
+      headers: { "Authorization": `Bearer ${TOKEN}` }
+    });
+
+    if (!res.ok)
+      return showToast("Failed to start session");
+
+    const data = await res.json();
+
+    sessionActive = true;
+    document.querySelector(".card").classList.add("session-active");
+    sessionExpiry = new Date(data.expiresAt);
+
+    socket.emit("joinSession", currentSessionId);
+    startCountdown();
+
+    showToast(`Session started • PIN: ${data.pin}`);
+  }
+
+  async function confirmStopSession() {
+    if (!currentSessionId) return;
+
+    await fetch(`${API_BASE}/sessions/${currentSessionId}/stop`, {
+      method: "POST",
+      headers: { "Authorization": `Bearer ${TOKEN}` }
+    });
+
+    resetSessionUI();
+    document.querySelector(".card").classList.remove("session-active");
+    showToast("Session stopped");
+  }
+
+  function startCountdown() {
+    clearInterval(countdownInterval);
+
+    countdownInterval = setInterval(() => {
+      const diff = sessionExpiry - new Date();
+      const el = document.getElementById("countdownText");
+
+      if (diff <= 0) {
+        el.textContent = "00:00";
+        clearInterval(countdownInterval);
+        resetSessionUI();
+        return;
+      }
+
+      const m = Math.floor(diff / 60000);
+      const s = Math.floor((diff % 60000) / 1000);
+
+      el.textContent =
+        `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+    }, 1000);
+  }
+
+  function resetSessionUI() {
+    clearInterval(countdownInterval);
+
+    document.getElementById("countdownText").textContent = "--:--";
+    document.getElementById("presentCount").textContent = "0";
+    document.getElementById("attendancePercent").textContent = "0%";
+    document.getElementById("liveList").innerHTML = "";
+    document.getElementById("sessionRoom").value = "";
+
+    currentSessionId = null;
+    sessionActive = false;
+  }
+
+  function updateLiveUI(data) {
+    const present = data.presentCount || 0;
+    const total = data.totalStudents || 0;
+
+    const presentEl = document.getElementById("presentCount");
+    presentEl.textContent = present;
+    presentEl.classList.add("bump");
+    setTimeout(() => presentEl.classList.remove("bump"), 200);
+
+    const percent =
+      total > 0 ? Math.round((present / total) * 100) : 0;
+
+    document.getElementById("attendancePercent").textContent =
+      percent + "%";
+
+    updateLiveList(data);
+  }
+
+function updateLiveList(data) {
+
+  const list = document.getElementById("liveList");
+  const empty = document.getElementById("emptyState");
+
+  list.innerHTML = "";
+
+  const students = data.students || [];
+
+  if (students.length === 0) {
+    empty.style.display = "block";
+    return;
+  }
+
+  empty.style.display = "none";
+
+  students.forEach(s => {
+
+    const li = document.createElement("li");
+    li.className = "list-item-clean";
+li.innerHTML = `
+  <a href="/teacher/student/${s.roll}" class="text-link">
+    ${s.name} (${s.roll})
+  </a>
+`;
+    list.appendChild(li);
+  });
+}
+
+  function showToast(message) {
+    const toast = document.getElementById("glassToast");
+    toast.textContent = message;
+    toast.classList.add("show");
+
+    setTimeout(() => {
+      toast.classList.remove("show");
+    }, 3000);
+  }
+
+  </script>
+
+  <div id="glassToast" class="toast"></div>
+
+</body>
+</html>
+

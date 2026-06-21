@@ -1,0 +1,502 @@
+/* ===================================
+   SPMS COMPONENT SYSTEM
+=================================== */
+
+/* -------------------------------
+   1. PANEL (Core Building Block)
+---------------------------------*/
+
+.panel {
+  border-radius: 16px;
+  padding: 24px;
+
+  background: var(--bg-2);
+  border: 1px solid rgba(255,255,255,0.08);
+
+  transition:
+    transform 0.25s ease,
+    border 0.25s ease;
+}
+
+.panel:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent);
+}
+
+.course-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--text-primary);
+}
+
+.panel .btn {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+.panel .btn:hover {
+  background: rgba(255,255,255,0.04);
+}
+
+/* ===================================
+  2. CARD — ENGINEERED DEPTH
+=================================== */
+
+.card {
+  position: relative;
+  border-radius: 20px;
+  padding: var(--space-4);
+  will-change: transform;
+
+  background: linear-gradient(180deg, rgba(255,255,255,0.03) 0%,
+                                      rgba(255,255,255,0.01) 60%,
+                                      rgba(255,255,255,0.00) 100%),var(--bg-1);
+
+  border: 1px solid rgba(255,255,255,0.04);
+
+  box-shadow:
+    0 18px 35px rgba(0,0,0,0.42),
+    0 1px 0 rgba(255,255,255,0.03) inset;
+
+  transition:
+    transform 0.35s var(--motion-smooth),
+    box-shadow 0.35s var(--motion-smooth),
+    border 0.35s ease;
+}
+
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow:
+    0 40px 80px rgba(0,0,0,0.6),
+    0 1px 0 rgba(255,255,255,0.06) inset;
+}
+
+.card > * + * {
+  margin-top: 20px;
+}
+
+/* -------------------------------
+   3. BUTTON SYSTEM
+---------------------------------*/
+
+.btn {
+  display: inline-block;
+  border-radius: var(--radius-md);
+  padding: 12px 18px;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  border: 1px solid rgba(255,255,255,0.05);
+  background: var(--bg-2);
+  color: var(--text-primary);
+  text-decoration: none;
+
+  cursor: pointer;
+
+  transition:
+    background 0.25s var(--motion-soft),
+    transform 0.2s var(--motion-soft),
+    box-shadow 0.25s var(--motion-soft),
+    border 0.25s var(--ease);
+}
+
+.btn:hover {
+  transform: translateY(-3px);
+  border-color: var(--border-strong);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.45);
+  text-decoration: none;
+}
+
+.btn:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+/* Accent Button */
+
+/* ===================================
+   PRIMARY ACTION BUTTON
+=================================== */
+
+.btn-accent {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  font-weight: 600;
+
+  box-shadow: 0 6px 18px rgba(91,124,255,0.35);
+}
+
+.btn-accent:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(91,124,255,0.45);
+}
+
+/* Ghost Button */
+
+.btn-ghost {
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+}
+
+/* -------------------------------
+   4. INPUT SYSTEM
+---------------------------------*/
+
+.input {
+  width: 100%;
+  padding: 12px 14px;
+
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+
+  background: var(--bg-2);
+  color: var(--text-primary);
+
+  transition:
+    border 0.25s var(--ease),
+    box-shadow 0.25s var(--ease);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+/* -------------------------------
+   5. STAT BLOCK
+---------------------------------*/
+
+/* ===================================
+   STAT BLOCK — AUTHORITY MODE
+=================================== */
+
+.stat {
+  padding: 22px 24px;
+  border-radius: 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  background: linear-gradient(
+    180deg,
+    rgba(255,255,255,0.02),
+    rgba(255,255,255,0.01)
+  ), var(--bg-tertiary);
+
+  border: 1px solid rgba(255,255,255,0.06);
+
+  box-shadow:
+    0 10px 25px rgba(0,0,0,0.35),
+    0 1px 0 rgba(255,255,255,0.04) inset;
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.stat:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 20px 45px rgba(0,0,0,0.45),
+    0 1px 0 rgba(255,255,255,0.06) inset;
+}
+
+.stat-value {
+  font-size: 26px;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+}
+
+.stat-label {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+label {
+  font-size: 13px;
+  color: var(--text-secondary);
+  display: block;
+  margin-bottom: 6px;
+}
+/* -------------------------------
+   6. LIST SYSTEM
+---------------------------------*/
+
+.list {
+  list-style: none;
+  margin-top: var(--space-3);
+}
+
+.list-item {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* ===================================
+   LIVE ACTIVITY LIST — FEED MODE
+=================================== */
+
+.list-item-clean {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 14px 0;
+
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+
+  font-size: 14px;
+
+  transition:
+    background 0.25s ease,
+    padding-left 0.25s ease;
+}
+
+.list-item-clean:last-child {
+  border-bottom: none;
+}
+
+.list-item-clean:hover {
+  background: rgba(255,255,255,0.03);
+  padding-left: 6px;
+}
+
+.list-item > div > div:first-child {
+  font-weight: 500;
+}
+
+.list-item button {
+  min-width: 80px;
+}
+
+.list-item:last-child {
+  border-bottom: none;
+}
+
+/* -------------------------------
+   7. BADGE
+---------------------------------*/
+
+.badge {
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+/* -------------------------------
+   8. TOAST
+---------------------------------*/
+
+.toast {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+
+  padding: 14px 20px;
+  border-radius: var(--radius-md);
+
+  background: var(--bg-2);
+  border: 1px solid var(--border-strong);
+
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.3s var(--ease);
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ===================================
+   PRIORITY WEIGHT SYSTEM
+=================================== */
+
+/* Action Card (Session Control) */
+.card.priority {
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow:
+    0 28px 65px rgba(0,0,0,0.6),
+    0 1px 0 rgba(255,255,255,0.04) inset;
+}
+
+/* Make primary button slightly stronger */
+.card.priority .btn-accent {
+  box-shadow: 0 8px 25px rgba(91,124,255,0.35);
+}
+
+/* Data card slightly more neutral */
+.card.data-layer {
+  border-color: rgba(255,255,255,0.05);
+}
+
+/* ===================================
+   ANALYTICS HEADER
+=================================== */
+
+.analytics-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.analytics-header > div {
+  text-align: center;
+}
+
+.analytics-divider {
+  width: 1px;
+  height: 50px;
+  background: rgba(255,255,255,0.08);
+}
+
+/* ===================================
+   LIVE ACTIVITY LIST — REFINED
+=================================== */
+
+.live-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+
+.live-row:last-child {
+  border-bottom: none;
+}
+
+.live-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #22c55e;
+}
+
+.live-name {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.live-roll {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.live-status {
+  font-size: 12px;
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+
+/* ===================================
+   COURSE MODULE — STRUCTURED BLOCK
+=================================== */
+
+.course-block {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  padding: 22px;
+
+  border-radius: 18px;
+
+  background: var(--bg-tertiary);
+  border: 1px solid rgba(255,255,255,0.06);
+
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease,
+    border 0.3s ease;
+}
+
+.course-block:hover {
+  transform: translateY(-6px);
+  border-color: rgba(91,124,255,0.4);
+  box-shadow:
+    0 20px 50px rgba(0,0,0,0.45);
+}
+
+/* ===================================
+   SESSION ACTIVE STATE
+=================================== */
+
+.card.session-active {
+  border: 1px solid rgba(91,124,255,0.5);
+
+  box-shadow:
+    0 0 0 1px rgba(91,124,255,0.25),
+    0 20px 50px rgba(0,0,0,0.6);
+}
+
+/* ===================================
+   EMPTY STATE — PROFESSIONAL
+=================================== */
+
+.empty-state {
+  margin-top: 20px;
+  padding: 30px;
+  border-radius: 16px;
+
+  text-align: center;
+  font-size: 14px;
+
+  background: rgba(255,255,255,0.02);
+  border: 1px dashed rgba(255,255,255,0.08);
+
+  color: var(--text-secondary);
+
+  transition: opacity 0.3s ease;
+}
+
+/* ===================================
+   STUDENT SESSION ACTIVE STATE
+=================================== */
+
+.student-mode .card.session-active {
+  border: 1px solid rgba(91,124,255,0.4);
+
+  box-shadow:
+    0 0 0 1px rgba(91,124,255,0.2),
+    0 20px 45px rgba(0,0,0,0.5);
+}
+
+/* ===================================
+   ANALYTICS CARD REFINEMENT
+=================================== */
+
+.analytics-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+.analytics-card canvas {
+  margin-top: 10px;
+}
+

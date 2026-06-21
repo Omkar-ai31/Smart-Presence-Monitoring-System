@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Student Dashboard - SPMS</title>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/system.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages.css') }}">
+
+</head>
+
+<body class="dashboard-shell student-mode">
+
+<header class="topbar flex-between">
+  <div>
+    <div class="topbar-title">Student Dashboard</div>
+    <div class="topbar-subtitle">{{ session.get('student_name', 'Student') }}</div>
+  </div>
+  <a href="{{ url_for('student_logout') }}" class="btn btn-ghost">Logout</a>
+</header>
+
+<main class="dashboard-main page-shell">
+
+<div class="card section-spacing">
+  <div class="section-header">
+    <div class="h-md">Attendance Overview</div>
+  </div>
+
+  <div class="grid-3 mt-3">
+    <div class="stat">
+      <div class="stat-value" id="totalSessions">0</div>
+      <div class="stat-label">Total Sessions</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value" id="attendedSessions">0</div>
+      <div class="stat-label">Attended</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value" id="att-percent">0%</div>
+      <div class="stat-label">Attendance %</div>
+    </div>
+  </div>
+</div>
+
+<div class="mt-4">
+  <a href="{{ url_for('student_attendance_summary') }}"
+     class="btn btn-accent full-width">
+     View Full Attendance Summary
+  </a>
+</div>
+
+<div class="card section-spacing">
+  <div class="section-header">
+    <div class="h-md">Join Session</div>
+  </div>
+
+  <div class="mt-3">
+    <label class="text-secondary">Enter Session PIN</label>
+    <input id="pinInput" class="input mt-1" placeholder="Enter PIN">
+  </div>
+
+  <div class="mt-3">
+    <button id="markBtn" class="btn btn-accent full-width">
+      Join Session
+    </button>
+  </div>
+
+  <div id="countdownBox" class="mt-4 stat" style="display:none;">
+    <div class="stat-label">Session Ends In</div>
+    <div id="countdown" class="stat-value mt-1">00:00</div>
+  </div>
+</div>
+
+<div id="glassToast" class="toast"></div>
+
+</main>
+
+<script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+
+<script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+<script>
+
+const API_BASE = "{{ api_base }}";
+const BACKEND_BASE = API_BASE.replace("/api", "");
+const ROLL = "{{ roll }}";
+
+let activeSessionId = null;
+let sessionEndTime = null;
+let countdownTimer = null;
+
+const markBtn = document.getElementById("markBtn");
+const countdownBox = document.getElementById("countdownBox");
+const countdownText = document.getElementById("countdown");
+
+/* ================= SOCKET ================= */
+
+const socket = io(BACKEND_BASE);
+
+socket.on("sessionStarted", (data) => {
+  activateSession(data.sessionId, data.expiresAt);
+});
+
+socket.on("sessionStopped", () => resetSession());
+
+function activateSession(sessionId, expiresAt) {
+  activeSessionId = sessionId;
+  sessionEndTime = new Date(expiresAt).getTime();
+  socket.emit("joinSession", sessionId);
+
+  countdownBox.style.display = "block";
+  markBtn.disabled = false;
+  startCountdown();
+}
+
+/* ================= LOAD ACTIVE SESSION ================= */
+
+(async function loadActiveSession() {
+  try {
+    const res = await fetch(`${API_BASE}/sessions/active`);
+    if (!res.ok) return;
+
+    const data = await res.json();
+    if (data && data.sessionId) {
+      activateSession(data.sessionId, data.expiresAt);
+    }
+  } catch (err) {
+    console.error(err);
+  }
+})();
+
+/* ================= LOAD SUMMARY ================= */
+
+async function loadSummary() {
+  try {
+    const res = await fetch(`${API_BASE}/attendance/summary/${ROLL}`);
+    if (!res.ok) return;
+
+    const data = await res.json();
+
+    document.getElementById("totalSessions").textContent =
+      data.totalSessions || 0;
+
+    document.getElementById("attendedSessions").textContent =
+      data.presentSessions || 0;
+
+    document.getElementById("att-percent").textContent =
+      (data.percentage || 0) + "%";
+
+  } catch (err) {
+    console.error("Summary error:", err);
+  }
+}
+
+loadSummary();
+
+/* ================= MARK ATTENDANCE ================= */
+
+markBtn.addEventListener("click", async () => {
+
+  const pin = document.getElementById("pinInput").value.trim();
+
+  if (!pin) {
+    showToast("Enter a session PIN");
+    return;
+  }
+
+  if (!activeSessionId) {
+    showToast("No active session available");
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API_BASE}/attendance`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        pin,
+        roll: ROLL,
+        sessionId: activeSessionId
+      })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      showToast(data.msg || "Invalid or expired PIN");
+      return;
+    }
+
+    showToast("Attendance marked successfully");
+
+    loadSummary(); // 🔥 refresh summary after marking
+
+  } catch (err) {
+    showToast("Network error");
+  }
+
+});
+
+/* ================= COUNTDOWN ================= */
+
+function startCountdown() {
+  clearInterval(countdownTimer);
+
+  countdownTimer = setInterval(() => {
+    const diff = sessionEndTime - Date.now();
+    if (diff <= 0) return resetSession();
+
+    const m = Math.floor(diff / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+
+    countdownText.textContent =
+      `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+  }, 1000);
+}
+
+function resetSession() {
+  clearInterval(countdownTimer);
+  activeSessionId = null;
+  countdownBox.style.display = "none";
+}
+
+function showToast(msg) {
+  const toast = document.getElementById("glassToast");
+  toast.textContent = msg;
+  toast.classList.add("show");
+  setTimeout(() => toast.classList.remove("show"), 3000);
+}
+
+</script>
+
+</body>
+</html>
+

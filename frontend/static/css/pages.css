@@ -1,0 +1,317 @@
+/* ===================================
+   SPMS LAYOUT ENGINE
+=================================== */
+
+/* -------------------------------
+   1. DASHBOARD SHELL
+---------------------------------*/
+
+.dashboard-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 60px;
+}
+
+.dashboard-main {
+  flex: 1;
+  padding: 30px 60px 60px;
+
+  animation: pageFadeIn 0.7s var(--ease) forwards;
+  opacity: 0;
+  transform: translateY(20px);
+  max-width: 1400px;
+  margin: 0 auto;
+
+  /*=============================
+  ENGINEERED MOTION
+  ===============================*/
+  animation: dashboardFadeIn 0.7s cubic-bezier(0.22,1,0.36,1) forwards;
+  opacity: 0;
+}
+
+@keyframes dashboardFadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pageFadeIn {
+  to {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Stagger internal cards */
+
+.dashboard-main .card {
+  opacity: 0;
+  animation: cardRise 0.6s cubic-bezier(0.22,1,0.36,1) forwards;
+}
+
+.dashboard-main .card:nth-child(1) {
+  animation-delay: 0.15s;
+}
+
+.dashboard-main .dashboard-grid .card:nth-child(1) {
+  animation-delay: 0.25s;
+}
+
+.dashboard-main .dashboard-grid .card:nth-child(2) {
+  animation-delay: 0.35s;
+}
+
+@keyframes cardRise {
+  to {
+    opacity: 1;
+  }
+}
+/* -------------------------------
+   2. DASHBOARD GRID
+---------------------------------*/
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 40px;
+  align-items: start;
+  margin-top: var(--space-5);
+}
+
+@media (max-width: 1100px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.dashboard-grid > .card:first-child {
+  border-color: rgba(91,124,255,0.25);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.55), 0 0 0 1px rgba(91,124,255,0.08);
+}
+
+/* -------------------------------
+   3. SECTION HEADER
+---------------------------------*/
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.card .section-header {
+  padding-bottom: 16px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+/* -------------------------------
+   4. AUTH LAYOUT
+---------------------------------*/
+
+.auth-shell {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-container {
+  width: 100%;
+  max-width: 1100px;
+
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: var(--space-6);
+
+  padding: var(--space-6);
+}
+
+@media (max-width: 1000px) {
+  .auth-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* -------------------------------
+   5. ROLE LANDING
+---------------------------------*/
+
+.role-shell {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.role-container {
+  width: 100%;
+  max-width: 1300px;
+
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: var(--space-6);
+
+  padding: var(--space-6);
+}
+
+@media (max-width: 1000px) {
+  .role-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* -------------------------------
+   6. ERP LAYOUT
+---------------------------------*/
+
+.erp-shell {
+  min-height: 100vh;
+  padding: var(--space-6);
+}
+
+.erp-grid {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: var(--space-5);
+}
+
+@media (max-width: 1100px) {
+  .erp-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===================================
+   STUDENT DASHBOARD TONE
+=================================== */
+
+body.dashboard-shell.student-mode {
+  background:
+    radial-gradient(
+      1200px 800px at 50% 0%,
+      rgba(91,124,255,0.05),
+      transparent 60%
+    ),
+    var(--bg-0);
+}
+
+/* Slightly softer cards */
+.student-mode .card {
+  box-shadow:
+    0 12px 30px rgba(0,0,0,0.35),
+    0 1px 0 rgba(255,255,255,0.03) inset;
+
+}
+
+/* Stats calmer */
+.student-mode .stat {
+  box-shadow:
+    0 6px 18px rgba(0,0,0,0.25);
+}
+
+/* summary page grid tuning */
+.student-mode .dashboard-grid {
+  align-items: stretch;
+  gap: 40px;
+}
+
+/* ==============================
+   ATTENDANCE SUMMARY LAYOUT
+============================== */
+
+.summary-layout {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;  /* ⬅ left card wider */
+  gap: 40px;
+}
+
+/* make sure cards stretch properly */
+.summary-layout .card {
+  height: 100%;
+}
+
+/* inner stat grid */
+.summary-layout .grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+  margin-top: 20px;
+}
+
+/* stat mini cards */
+.summary-layout .stat {
+  padding: 32px 20px;
+  border-radius: 18px;
+  text-align: center;
+}
+
+/* responsive fix */
+@media (max-width: 992px) {
+
+  .summary-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .summary-layout .grid-3 {
+    grid-template-columns: 1fr;
+  }
+}
+
+.summary-layout .stat-value {
+  font-size: 34px;
+  font-weight: 600;
+}
+
+.summary-layout .stat-label {
+  font-size: 14px;
+  margin-top: 8px;
+  opacity: 0.7;
+}
+
+.summary-layout canvas {
+  margin: 0 auto;
+  display: block;
+}
+
+/* ==============================
+   TEACHER PERFORMANCE LAYOUT
+============================== */
+
+.teacher-layout {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 40px;
+}
+
+.right-column {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+/* responsive */
+@media (max-width: 992px) {
+  .teacher-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+#trendIndicator {
+  font-weight: 500;
+  letter-spacing: 0.3px;
+}
+
+#recommendationBox {
+  padding: 10px 14px;
+  border-left: 3px solid rgba(148,163,184,0.4);
+  background: rgba(148,163,184,0.05);
+  border-radius: 6px;
+  font-size: 14px;
+}
+

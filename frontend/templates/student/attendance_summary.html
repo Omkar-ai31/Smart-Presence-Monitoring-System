@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Attendance Summary - SPMS</title>
+
+  <!-- DESIGN SYSTEM -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/system.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/pages.css') }}">
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body class="dashboard-shell student-mode">
+
+<!-- TOPBAR -->
+<header class="topbar flex-between">
+  <div>
+    <div class="topbar-title">Attendance Summary</div>
+    <div class="topbar-subtitle">
+      Roll: {{ roll }}
+    </div>
+  </div>
+
+  <a href="{{ url_for('student_dashboard') }}" class="btn btn-ghost">
+    Back
+  </a>
+</header>
+
+<!-- MAIN -->
+<main class="dashboard-main page-shell">
+
+  <div class="dashboard-grid summary-layout">
+
+    <!-- LEFT PANEL -->
+    <div class="card">
+
+      <div class="section-header">
+        <div>
+          <div class="h-md">Overall Performance</div>
+          <div class="text-muted mt-1">
+            Academic attendance analytics overview
+          </div>
+        </div>
+      </div>
+
+      <div class="summary-stats mt-4">
+
+        <div class="stat">
+          <div class="stat-value" id="presentCount">0</div>
+          <div class="stat-label">Present</div>
+        </div>
+
+        <div class="stat">
+          <div class="stat-value" id="totalCount">0</div>
+          <div class="stat-label">Total Sessions</div>
+        </div>
+
+        <div class="stat">
+          <div class="stat-value" id="attPercent">0%</div>
+          <div class="stat-label">Attendance %</div>
+        </div>
+
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="text-secondary">
+        Attendance consistency directly reflects academic discipline.
+      </div>
+
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="card center analytics-card">
+
+      <div class="section-header">
+        <div class="h-md">Attendance Distribution</div>
+      </div>
+
+      <div class="mt-4 center">
+        <canvas id="attendanceChart" width="260" height="260"></canvas>
+      </div>
+
+    </div>
+
+  </div>
+
+</main>
+
+<div id="glassToast" class="toast"></div>
+
+<script>
+
+/* =========================
+   CONFIG
+========================= */
+
+const API_BASE = "{{ api_base }}";
+const ROLL = "{{ roll }}";
+
+let chartInstance = null;
+
+/* =========================
+   LOAD SUMMARY
+========================= */
+
+async function loadSummary() {
+  try {
+
+    const res = await fetch(`${API_BASE}/attendance/summary/${ROLL}`);
+    if (!res.ok) return;
+
+    const data = await res.json();
+
+    const present = Math.max(0, data.presentSessions || 0);
+    const total = Math.max(0, data.totalSessions || 0);
+    const absent = Math.max(0, total - present);
+    const percent = total === 0 ? 0 : Math.round((present / total) * 100);
+
+    document.getElementById("presentCount").textContent = present;
+    document.getElementById("totalCount").textContent = total;
+    document.getElementById("attPercent").textContent = percent + "%";
+
+    updatePerformanceTone(percent);
+    drawChart(present, absent);
+
+  } catch (e) {
+    console.error("Attendance summary error", e);
+  }
+}
+
+/* =========================
+   PERFORMANCE TONE
+========================= */
+
+function updatePerformanceTone(percent) {
+  const percentEl = document.getElementById("attPercent");
+
+  percentEl.classList.remove("text-success", "text-warning", "text-danger");
+
+  if (percent >= 75) {
+    percentEl.style.color = "#22c55e";
+  } else if (percent >= 50) {
+    percentEl.style.color = "#f59e0b";
+  } else {
+    percentEl.style.color = "#ef4444";
+  }
+}
+
+/* =========================
+   DOUGHNUT CHART
+========================= */
+
+function drawChart(present, absent) {
+
+  const ctx = document.getElementById("attendanceChart");
+
+  if (chartInstance) {
+    chartInstance.destroy();
+  }
+
+  chartInstance = new Chart(ctx, {
+    type: "doughnut",
+    data: {
+      labels: ["Present", "Absent"],
+      datasets: [{
+        data: [present, absent],
+        backgroundColor: ["#22c55e", "#ef4444"],
+        borderWidth: 0
+      }]
+    },
+    options: {
+      responsive: false,
+      cutout: "72%",
+      plugins: {
+        legend: {
+          labels: {
+            color: "#9aa4bf",
+            font: { size: 13 }
+          }
+        }
+      }
+    }
+  });
+}
+
+loadSummary();
+
+</script>
+
+</body>
+</html>
+

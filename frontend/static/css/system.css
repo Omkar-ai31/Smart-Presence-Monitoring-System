@@ -1,0 +1,230 @@
+/* ===================================
+   SPMS DESIGN SYSTEM — FOUNDATION
+=================================== */
+
+/* -------------------------------
+   1. COLOR SYSTEM
+---------------------------------*/
+
+:root {
+
+  /* Core Background Layers */
+  --bg-0: #0b0f17;       /* main shell */
+  --bg-1: #131a27;       /* level 1 */
+  --bg-2: #182131;       /* level 2 */
+  --bg-3: #1f293d;       /* level 3 */
+
+  /* Borders */
+  --border-subtle: rgba(255,255,255,0.05);
+  --border-strong: rgba(255,255,255,0.10);
+
+  /* Typography */
+  --text-primary: #f5f7ff;
+  --text-secondary: #9aa4bf;
+  --text-muted: #6f7894;
+
+  /* Brand Identity */
+  --accent: #5b7cff;
+  --accent-soft: rgba(91,124,255,0.18);
+
+  /* States */
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --danger: #ff4d6d;
+
+  /* Radius */
+  --radius-lg: 20px;
+  --radius-md: 14px;
+  --radius-sm: 10px;
+
+  /* Motion Curve */
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Spacing Scale */
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
+  --space-5: 48px;
+  --space-6: 64px;
+
+  /*motion system */
+  --motion-smooth: cubic-bezier(0.22,1,0.36,1);
+  --motion-soft: cubic-bezier(0.25,0.8,0.25,1);
+}
+
+/* -------------------------------
+   2. GLOBAL BACKGROUND
+---------------------------------*/
+
+body {
+  background: var(--bg-0);
+  color: var(--text-primary);
+  font-family: "Inter", "Poppins", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  position: relative;
+}
+
+/* Ambient lighting */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(
+      900px 600px at 15% 25%,
+      rgba(91,124,255,0.05),
+      transparent 60%
+    ),
+    radial-gradient(
+      800px 500px at 85% 75%,
+      rgba(91,124,255,0.03),
+      transparent 60%
+    );
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Subtle grid depth */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 60px 60px;
+  opacity: 0.25;
+  mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
+}
+
+/* -------------------------------
+   3. TYPOGRAPHY SCALE
+---------------------------------*/
+
+.h-xl {
+  font-size: 40px;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+}
+
+.h-lg {
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.h-md {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+}
+
+.section-header .h-md {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+}
+
+.text-secondary {
+  color: var(--text-secondary);
+}
+
+.text-muted {
+  color: #7c8796;
+  font-size: 14px;
+  opacity: 0.65;
+}
+
+/* -------------------------------
+   4. ELEVATION SYSTEM
+---------------------------------*/
+
+.elev-1 {
+  background: var(--bg-1);
+  border: 1px solid var(--border-subtle);
+}
+
+.elev-2 {
+  background: var(--bg-2);
+  border: 1px solid var(--border-subtle);
+}
+
+.elev-3 {
+  background: var(--bg-3);
+  border: 1px solid var(--border-strong);
+}
+
+.depth-shadow {
+  box-shadow:
+    0 10px 30px rgba(0,0,0,0.45),
+    0 1px 0 rgba(255,255,255,0.03) inset;
+}
+
+/* ===================================
+   DEPTH LAYERING — 3 LEVEL SYSTEM
+=================================== */
+
+/* Level 0 — Background */
+body.dashboard-shell {
+  background: radial-gradient(1200px 800px at 10% 10%, rgba(8, 33, 92, 0.9), transparent 60%),
+  radial-gradient(1000px 600px at 90% 90%, rgba(8, 33, 92, 0.9), transparent 60%),#0b0f17;
+}
+
+/* Level 1 — Main Cards */
+.card {
+  background: #141a26;
+  border: 1px solid rgba(255,255,255,0.05);
+
+  box-shadow:
+    0 10px 30px rgba(0,0,0,0.45),
+    0 1px 0 rgba(255,255,255,0.03) inset;
+}
+
+/* Level 2 — Inner Panels */
+.panel,
+.stat {
+  background: #1a2130;
+  border: 1px solid rgba(255,255,255,0.04);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border 0.25s ease;
+}
+
+.panel:hover,
+.stat:hover {
+  transform: translateY(-3px);
+}
+
+/* Subtle lift on hover */
+.card:hover {
+  box-shadow:
+    0 25px 60px rgba(0,0,0,0.6),
+    0 1px 0 rgba(255,255,255,0.05) inset;
+}
+
+/* ===================================
+   STUDENT TYPOGRAPHY CALIBRATION
+=================================== */
+
+.student-mode .topbar-title {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+}
+
+.student-mode .h-md {
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.student-mode .stat-value {
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+}
+
+/* Softer muted tone */
+.student-mode .text-muted,
+.student-mode .text-secondary {
+  opacity: 0.75;
+}
+

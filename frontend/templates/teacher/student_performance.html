@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Student Performance - SPMS</title>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/system.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/pages.css') }}">
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body class="dashboard-shell">
+
+<header class="topbar flex-between">
+  <div>
+    <div class="topbar-title">Student Performance</div>
+    <div class="topbar-subtitle">Roll: {{ roll }}</div>
+  </div>
+  <a href="{{ url_for('teacher_dashboard') }}" class="btn btn-ghost">Back</a>
+</header>
+
+<main class="dashboard-main page-shell">
+  <div class="teacher-layout">
+
+    <!-- LEFT COLUMN -->
+    <div class="left-column">
+
+      <div class="card section-spacing">
+
+        <div class="section-header flex-between">
+          <div class="h-md">Session History</div>
+
+          <div class="flex gap-12">
+            <select id="statusFilter" class="input" style="width:160px;">
+              <option value="all">All</option>
+              <option value="present">Present</option>
+              <option value="absent">Absent</option>
+            </select>
+
+            <button id="exportBtn" class="btn btn-accent">
+              Export CSV
+            </button>
+          </div>
+        </div>
+
+        <ul id="historyList" class="list-clean mt-3"></ul>
+
+        <div id="emptyHistory" class="empty-state">
+          No attendance records found
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div class="right-column">
+
+      <!-- Overall Performance -->
+      <div id="performanceCard" class="card section-spacing">
+
+        <div class="section-header">
+          <div class="h-md">Overall Performance</div>
+        </div>
+
+        <div class="mt-3">
+          <span id="riskBadge" class="badge">Status</span>
+          <div id="trendIndicator" class="mt-2 text-muted"></div>
+        </div>
+
+        <div id="riskMessage" class="mt-4 text-muted"></div>
+
+        <div class="grid-3 mt-4">
+          <div class="stat">
+            <div class="stat-value" id="presentCount">0</div>
+            <div class="stat-label">Present</div>
+          </div>
+
+          <div class="stat">
+            <div class="stat-value" id="absentCount">0</div>
+            <div class="stat-label">Absent</div>
+          </div>
+
+          <div class="stat">
+            <div class="stat-value" id="attPercent">0%</div>
+            <div class="stat-label">Attendance %</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chart -->
+      <div class="card analytics-card">
+        <div class="section-header">
+          <div class="h-md">Attendance Distribution</div>
+        </div>
+        <canvas id="attendanceChart" width="260" height="260"></canvas>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<script>
+
+const API_BASE = "{{ api_base }}";
+const ROLL = "{{ roll }}";
+
+const ATTENDANCE_POLICY = {
+  excellent: 75,
+  warning: 60,
+  critical: 50
+};
+
+let chartInstance = null;
+let studentData = null;
+
+/* ================= LOAD DATA ================= */
+
+async function loadStudentPerformance() {
+
+  const res = await fetch(`${API_BASE}/attendance/student/${ROLL}`);
+  if (!res.ok) return;
+
+  const data = await res.json();
+  studentData = data;
+
+  const present = data.presentSessions || 0;
+  const absent = data.absentSessions || 0;
+  const percent = data.percentage || 0;
+
+  document.getElementById("presentCount").textContent = present;
+  document.getElementById("absentCount").textContent = absent;
+  document.getElementById("attPercent").textContent = percent + "%";
+
+  /* TREND */
+  const trendEl = document.getElementById("trendIndicator");
+
+  if (data.trend === "improving") {
+    trendEl.textContent = "Trend: Improving ↑";
+    trendEl.style.color = "#22c55e";
+  }
+  else if (data.trend === "declining") {
+    trendEl.textContent = "Trend: Declining ↓";
+    trendEl.style.color = "#ef4444";
+  }
+  else {
+    trendEl.textContent = "Trend: Stable →";
+    trendEl.style.color = "#94a3b8";
+  }
+
+  applyRiskPolicy(percent);
+  drawChart(present, absent);
+  renderSessions("all");
+}
+
+/* ================= RISK ENGINE ================= */
+
+function applyRiskPolicy(percent) {
+
+  const badge = document.getElementById("riskBadge");
+  const message = document.getElementById("riskMessage");
+  const card = document.getElementById("performanceCard");
+
+  card.classList.remove("risk-low", "risk-medium", "risk-high", "risk-severe");
+
+  if (percent >= ATTENDANCE_POLICY.excellent) {
+
+    badge.textContent = "Excellent Standing";
+    badge.style.background = "rgba(34,197,94,0.15)";
+    badge.style.color = "#22c55e";
+    message.textContent =
+      "Student maintains strong academic attendance consistency.";
+
+    card.classList.add("risk-low");
+
+  }
+  else if (percent >= ATTENDANCE_POLICY.warning) {
+
+    badge.textContent = "Moderate Risk";
+    badge.style.background = "rgba(245,158,11,0.15)";
+    badge.style.color = "#f59e0b";
+    message.textContent =
+      "Attendance trending toward risk zone. Monitor closely.";
+
+    card.classList.add("risk-medium");
+
+  }
+  else if (percent >= ATTENDANCE_POLICY.critical) {
+
+    badge.textContent = "High Risk";
+    badge.style.background = "rgba(239,68,68,0.15)";
+    badge.style.color = "#ef4444";
+    message.textContent =
+      "Attendance below safe academic threshold. Advisory recommended.";
+
+    card.classList.add("risk-high");
+
+  }
+  else {
+
+    badge.textContent = "Severe Academic Risk";
+    badge.style.background = "rgba(127,29,29,0.20)";
+    badge.style.color = "#ef4444";
+    message.textContent =
+      "Critical attendance level. Immediate intervention required.";
+
+    card.classList.add("risk-severe");
+  }
+}
+
+/* ================= SESSION LIST ================= */
+
+function renderSessions(filterValue) {
+
+  const list = document.getElementById("historyList");
+  const empty = document.getElementById("emptyHistory");
+
+  list.innerHTML = "";
+
+  if (!studentData || !studentData.sessions) {
+    empty.style.display = "block";
+    return;
+  }
+
+  let filtered = studentData.sessions;
+
+  if (filterValue !== "all") {
+    filtered = filtered.filter(s => s.status === filterValue);
+  }
+
+  if (filtered.length === 0) {
+    empty.style.display = "block";
+    return;
+  }
+
+  empty.style.display = "none";
+
+  filtered.forEach(s => {
+
+    const li = document.createElement("li");
+    li.className = "list-item-clean";
+
+    const statusColor =
+      s.status === "present" ? "#22c55e" : "#ef4444";
+
+    li.innerHTML = `
+      <span>${s.date}</span>
+      <span style="color:${statusColor}; font-weight:500;">
+        ${s.status.toUpperCase()}
+      </span>
+    `;
+
+    list.appendChild(li);
+  });
+}
+
+/* FILTER */
+document.getElementById("statusFilter")
+  .addEventListener("change", (e) => {
+    renderSessions(e.target.value);
+  });
+
+/* EXPORT */
+document.getElementById("exportBtn")
+  .addEventListener("click", () => {
+
+    if (!studentData || !studentData.sessions.length) {
+      alert("No records to export");
+      return;
+    }
+
+    let csv = "Date,Status\n";
+
+    studentData.sessions.forEach(s => {
+      csv += `${s.date},${s.status}\n`;
+    });
+
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `attendance_${ROLL}.csv`;
+    a.click();
+
+    window.URL.revokeObjectURL(url);
+  });
+
+/* CHART */
+
+function drawChart(present, absent) {
+
+  const ctx = document.getElementById("attendanceChart");
+
+  if (chartInstance) chartInstance.destroy();
+
+  chartInstance = new Chart(ctx, {
+    type: "doughnut",
+    data: {
+      labels: ["Present", "Absent"],
+      datasets: [{
+        data: [present, absent],
+        backgroundColor: ["#22c55e", "#ef4444"],
+        borderWidth: 0
+      }]
+    },
+    options: {
+      responsive: false,
+      cutout: "70%",
+      plugins: {
+        legend: {
+          labels: { color: "#9aa4bf" }
+        }
+      }
+    }
+  });
+}
+
+loadStudentPerformance();
+
+</script>
+
+</body>
+</html>
+

@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+<meta charset="utf-8">
+<title>Teacher Signup - SPMS</title>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/system.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages.css') }}">
+
+</head>
+
+<body class="dashboard-shell">
+
+<main class="dashboard-main page-shell">
+
+<div class="grid-2">
+
+<!-- ================= LEFT PANEL ================= -->
+
+<div class="card section-spacing">
+
+<img
+src="{{ url_for('static', filename='img/logo.png') }}"
+alt="SPMS Logo"
+style="width:100px; margin-bottom:20px;"
+>
+
+<h1 class="title">
+Create Faculty Account
+</h1>
+
+<p class="subtitle mt-2" style="font-size:18px; line-height:1.7;">
+Register as a faculty member to create attendance sessions,
+monitor student participation in real time, and manage
+academic attendance records through the SPMS dashboard.
+</p>
+
+<div class="mt-4">
+
+<div class="panel mb-3">
+📊 Monitor attendance analytics
+</div>
+
+<div class="panel mb-3">
+⚡ Create real-time attendance sessions
+</div>
+
+<div class="panel mb-3">
+🔐 Secure authentication system
+</div>
+
+<div class="panel">
+🏫 Institutional ERP integration
+</div>
+
+</div>
+
+</div>
+
+
+<!-- ================= SIGNUP FORM ================= -->
+
+<div class="card section-spacing">
+
+<h2 class="h-md">
+Teacher Registration
+</h2>
+
+{% if error %}
+<div class="panel mt-3" style="border-left:4px solid #ef4444;">
+{{ error }}
+</div>
+{% endif %}
+
+<form method="post" class="mt-4">
+
+<label class="text-muted">Full Name</label>
+<input
+name="name"
+placeholder="Enter your name"
+class="input mt-1"
+required
+>
+
+<label class="text-muted mt-3">Email Address</label>
+<input
+type="email"
+name="email"
+placeholder="teacher@college.edu"
+class="input mt-1"
+required
+>
+
+<label class="text-muted mt-3">Password</label>
+<input
+type="password"
+name="password"
+placeholder="Create a secure password"
+class="input mt-1"
+required
+>
+
+<button
+type="submit"
+class="btn btn-accent full-width mt-4">
+Create Faculty Account
+</button>
+
+</form>
+
+<div class="panel mt-4">
+
+<div class="h-sm">Account Security</div>
+
+<p class="text-muted mt-2" style="font-size:14px; line-height:1.6;">
+Faculty accounts are verified through the SPMS authentication
+system. Only authorized instructors can create attendance sessions
+and access student analytics.
+</p>
+
+</div>
+
+<div class="flex-between mt-4">
+
+<a href="{{ url_for('teacher_login') }}" class="text-muted">
+← Already have an account?
+</a>
+
+<a href="{{ url_for('index') }}" class="btn btn-ghost">
+Back to Home
+</a>
+
+</div>
+
+</div>
+
+</div>
+
+</main>
+
+</body>
+</html>
+

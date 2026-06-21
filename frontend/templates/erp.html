@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>SPMS – Smart Presence Monitoring System</title>
+
+  <!-- SYSTEM CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/system.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/pages.css') }}">
+</head>
+
+<body class="dashboard-shell">
+<main class="dashboard-main page-shell">
+
+<!-- ================= HERO ================= -->
+<div class="card section-spacing" style="text-align:center;">
+
+  <img src="{{ url_for('static', filename='img/logo.png') }}"
+       alt="SPMS Logo"
+       style="width:110px; margin-bottom:25px;">
+
+  <h1 class="title" style="font-size:42px;">
+    Smart Presence Monitoring System
+  </h1>
+
+  <p class="subtitle" style="max-width:900px; margin:25px auto; font-size:20px; line-height:1.8;">
+    A complete ERP-based Attendance Intelligence Platform designed for
+    modern educational institutions. Secure architecture. Real-time validation.
+    Analytics-driven academic monitoring.
+  </p>
+
+  <div class="grid-2 mt-4">
+    <div class="stat">
+      <div class="stat-value">Real-Time</div>
+      <div class="stat-label">Session Validation</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">Secure</div>
+      <div class="stat-label">PIN-Based System</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">Analytics</div>
+      <div class="stat-label">Performance Intelligence</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">Zero Proxy</div>
+      <div class="stat-label">Integrity Enforcement</div>
+    </div>
+  </div>
+
+</div>
+
+
+<!-- ================= WHY SPMS ================= -->
+<div class="card section-spacing">
+  <div class="section-header">
+    <div class="h-md">Why Institutions Need SPMS</div>
+  </div>
+
+  <div class="grid-2 mt-4">
+
+    <div class="panel">
+      <div class="h-sm">Traditional Attendance Problems</div>
+      <ul class="text-muted mt-3" style="font-size:18px; line-height:1.8;">
+        <li>Manual roll calls</li>
+        <li>Proxy attendance issues</li>
+        <li>Paper record inconsistencies</li>
+        <li>Time-consuming validation</li>
+        <li>No real-time academic visibility</li>
+      </ul>
+    </div>
+
+    <div class="panel">
+      <div class="h-sm">SPMS Digital Transformation</div>
+      <ul class="text-muted mt-3" style="font-size:18px; line-height:1.8;">
+        <li>Session-based digital validation</li>
+        <li>Time-bound secure PIN system</li>
+        <li>Live attendance monitoring</li>
+        <li>Automated centralized records</li>
+        <li>Integrated analytics dashboard</li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ================= WORKFLOW ================= -->
+<div class="card section-spacing">
+  <div class="section-header">
+    <div class="h-md">System Workflow Architecture</div>
+  </div>
+
+  <div class="grid-2 mt-4">
+
+    <div class="panel">
+      <div class="h-sm">1️⃣ Teacher Creates Session</div>
+      <p class="text-muted mt-2" style="font-size:18px;">
+        Course session initiated with secure PIN generation.
+      </p>
+    </div>
+
+    <div class="panel">
+      <div class="h-sm">2️⃣ PIN Distribution</div>
+      <p class="text-muted mt-2" style="font-size:18px;">
+        Time-bound PIN shared with enrolled students.
+      </p>
+    </div>
+
+    <div class="panel">
+      <div class="h-sm">3️⃣ Student Validation</div>
+      <p class="text-muted mt-2" style="font-size:18px;">
+        Students validate presence during active session.
+      </p>
+    </div>
+
+    <div class="panel">
+      <div class="h-sm">4️⃣ Real-Time Recording</div>
+      <p class="text-muted mt-2" style="font-size:18px;">
+        Attendance stored securely with timestamp.
+      </p>
+    </div>
+
+    <div class="panel">
+      <div class="h-sm">5️⃣ Risk & Trend Engine</div>
+      <p class="text-muted mt-2" style="font-size:18px;">
+        Intelligent policy-based risk detection.
+      </p>
+    </div>
+
+    <div class="panel">
+      <div class="h-sm">6️⃣ Reports & Analytics</div>
+      <p class="text-muted mt-2" style="font-size:18px;">
+        Performance dashboards for teachers and students.
+      </p>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ================= STUDENT EXPERIENCE ================= -->
+<div class="card section-spacing">
+  <div class="section-header">
+    <div class="h-md">Student Experience</div>
+  </div>
+
+  <div class="grid-2 mt-4">
+
+    <div>
+      <h3 style="font-size:32px; margin-bottom:20px;">
+        Transparent & Intelligent Academic Tracking
+      </h3>
+
+      <p class="text-muted" style="font-size:20px; line-height:1.9;">
+        Students receive instant attendance confirmation and
+        complete visibility into their attendance analytics.
+        Clear performance indicators and session history
+        ensure proactive academic awareness.
+      </p>
+    </div>
+
+    <div class="panel">
+      <img src="{{ url_for('static', filename='img/student_dashboard.png') }}"
+           alt="Student Dashboard"
+           style="width:100%; border-radius:12px;">
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ================= TEACHER EXPERIENCE ================= -->
+<div class="card section-spacing">
+  <div class="section-header">
+    <div class="h-md">Teacher Experience</div>
+  </div>
+
+  <div class="grid-2 mt-4">
+
+    <div>
+      <h3 style="font-size:32px; margin-bottom:20px;">
+        Centralized Monitoring & Academic Intelligence
+      </h3>
+
+      <p class="text-muted" style="font-size:20px; line-height:1.9;">
+        Teachers manage sessions, monitor attendance live,
+        analyze student risk levels, and generate structured reports —
+        all from a centralized institutional dashboard.
+      </p>
+    </div>
+
+    <div class="panel">
+      <img src="{{ url_for('static', filename='img/teacher_dashboard.png') }}"
+           alt="Teacher Dashboard"
+           style="width:100%; border-radius:12px;">
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ================= SYSTEM DEMO VIDEO ================= -->
+<div class="card section-spacing" style="text-align:center;">
+
+  <div class="section-header" style="justify-content:center;">
+    <div class="h-md">System Demonstration</div>
+  </div>
+
+  <div class="mt-4" style="display:flex; justify-content:center;">
+    <video
+      style="width:80%; max-width:900px; border-radius:12px;"
+      autoplay
+      muted
+      loop
+      playsinline
+      controls>
+
+      <source src="{{ url_for('static', filename='video/spms-demo.mp4') }}"
+              type="video/mp4">
+
+      Your browser does not support the video tag.
+    </video>
+  </div>
+
+</div>
+
+
+<!-- ================= ACCESS PORTAL ================= -->
+<div class="card section-spacing" style="text-align:center;">
+  <div class="section-header" style="justify-content:center;">
+    <div class="h-md">Access Portal</div>
+  </div>
+
+  <div class="grid-2 mt-4">
+
+    <a href="{{ url_for('teacher_login') }}" class="panel hover-elevate">
+      <div class="h-sm">👨‍🏫 Teacher Portal</div>
+      <p class="text-muted mt-2">
+        Create sessions, monitor attendance, analyze performance.
+      </p>
+    </a>
+
+    <a href="{{ url_for('student_login') }}" class="panel hover-elevate">
+      <div class="h-sm">🎓 Student Portal</div>
+      <p class="text-muted mt-2">
+        Join sessions, validate attendance, track history.
+      </p>
+    </a>
+
+  </div>
+
+  <div class="divider"></div>
+
+  <a href="{{ url_for('index') }}" class="btn btn-accent">
+    Continue to Home
+  </a>
+
+</div>
+
+</main>
+</body>
+</html>
+
